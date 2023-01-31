@@ -22,9 +22,11 @@ def img_input(subject):
     if st.button('사진 분류하기'):
         if 'img_path' not in st.session_state:
             st.error('사진을 업로드 해주세요.')
-        # else:
-            # img = Image.open(st.session_state['img_path'])
-            # st.image(img)
+        else:
+            img = Image.open(st.session_state['img_path'])
+            st.image(img)
+            st.warning('분류 서비스는 추후 업데이트 예정입니다. ( local에서만 구현 완료 )')
+
         
 
 def img_save(directory, file):
@@ -40,9 +42,8 @@ def img_save(directory, file):
         st.session_state['img_name'] = img_name
         st.session_state['img_path'] = f'./{directory}/{img_name}'
         # 이미지 열기
-        img = Image.open(st.session_state['img_path'])
-        st.image(img)
-        st.warning('분류 서비스는 추후 업데이트 예정입니다. ( local에서만 구현 완료 )')
+#        img = Image.open(st.session_state['img_path'])
+#        st.image(img)
     else:
         st.error('사진이 선택되지 않았습니다.')
 
