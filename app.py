@@ -1,54 +1,121 @@
 import streamlit as st
-import pandas as pd
+from streamlit_option_menu import option_menu
+import streamlit.components.v1 as html
 
-# 시각화 라이브러리. 표 예쁘게
+import pandas as pd
+import numpy as np
+import os, sys
+from PIL import Image
+
 import plotly.express as px
 
-# st.title('Avocado Prices dashboard')
-
-st.markdown('''
-# Avocado Prices dashboard
-테스트용 대시보드를 만들어봅시다.
-Data source : [kaggle](https://www.kaggle.com/datasets/timmate/avocado-prices-2020)
-''')
-
-avocado = pd.read_csv('avocado.csv')
-
-# type별로 묶은 값을 평균값
-table = avocado.groupby('type').mean()
-
-# 특정 표만 받아 보기
-table_tot_av = avocado.groupby('type')['total_volume', 'average_price'].mean()
+from bee_classification import bee_classify
 
 
-# 위의 값을 streamlit에 호스팅하기
-st.dataframe(table_tot_av)
+# 함수
 
-# geography가 los angeles인 것만 받기
-# line_fig = px.line(
-#     avocado[avocado['geography'] == 'Los Angeles'],
-#     x='date', y='average_price',
-#     # 타입에 따라 색을 나누겠다
-#     color='type',
-#     title='Test dashboard'
-#     )
 
-# st.plotly_chart(line_fig)
+def img_input(subject):
+    image_file = st.file_uploader(f'분류할 {subject} 사진을 선택하세요.', type=['png', 'jpg', 'jpeg'])
+    if st.button('사진 업로드'):
+        img_save('image_files', image_file)
+    if st.button('사진 분류하기'):
+        if 'img_path' not in st.session_state:
+            st.error('사진을 업로드 해주세요.')
+        # else:
+            # img = Image.open(st.session_state['img_path'])
+            # st.image(img)
+        
 
-# selectbox - options : 불러올 내용, label : 실제 띄워줄 내용
-selected_geo = st.selectbox(label='Geography', options=avocado['geography'].unique())
+def img_save(directory, file):
+    # directory 확인, 없으면 생성
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    if file:
+        # 파일 저장
+        with open(os.path.join(directory, file.name), 'wb') as f:
+            f.write(file.getbuffer())
+        img_name = file.name
+        st.success('사진 {}이 업로드 되었습니다.'.format(img_name))        
+        st.session_state['img_name'] = img_name
+        st.session_state['img_path'] = f'./{directory}/{img_name}'
+        # 이미지 열기
+        # img = Image.open(st.session_state['img_path'])
+        # st.image(img)
+    else:
+        st.error('사진이 선택되지 않았습니다.')
 
-submitted = st.button('Submit')
+def button_in_button():
+    button1 = st.button('Check 1')
 
-# submit 버튼 눌리면
-if submitted:
-    line_fig = px.line(
-    avocado[avocado['geography'] == selected_geo],
-    x='date', y='average_price',
-    color='type',
-    # title='{} dashboard'.format(selected_geo)
-    title=f'{selected_geo} dashboard'
+    if st.session_state.get('button') != True:
 
+        st.session_state['button'] = button1
+
+    if st.session_state['button'] == True:
+
+        st.write("button1 is True")
+
+        if st.button('Check 2'):
+
+            st.write("Hello, it's working")
+
+            st.session_state['button'] = False
+
+            st.checkbox('Reload')
+
+
+# 사이드바 : 서비스 목록
+
+
+task_list = ['경구약제 사진 분류', '꿀벌 사진 분류', '코로나 데이터 분석', '두피 데이터 분석', '심리 상담 챗봇', '당뇨 예측']
+icon_list = ['bag-plus', 'bug', 'shield-exclamation', 'clipboard-data', 'chat-dots', 'activity']
+
+with st.sidebar:
+    choose = option_menu('인공지능 서비스',
+                         task_list,
+                         icons=icon_list,
+                         menu_icon = 'virus', default_index=0,
+                         styles={
+        "container": {"padding": "5!important", "background-color": "#fafafa"},
+        "icon": {"color": "orange", "font-size": "25px"}, 
+        "nav-link": {"font-size": "16px", "text-align": "left", "margin":"0px", "--hover-color": "#eee"},
+        "nav-link-selected": {"background-color": "#02ab21"},
+    }
     )
+st.title(choose)
+# selected_task = st.sidebar.selectbox(label='이용할 서비스를 선택하세요.', options=task_list)
+# '선택 된 서비스 : ', selected_task
 
-    st.plotly_chart(line_fig)
+
+# 메인페이지
+
+
+if choose == '경구약제 사진 분류':
+    img = img_input('의약품')
+
+
+if choose == '꿀벌 사진 분류':
+    img_input('꿀벌')
+    if 'img_path' in st.session_state:
+        bee_img_input = st.session_state['img_path']
+        # st.image(bee_img)
+        percentage, bee_state = bee_classify(bee_img_input)
+        st.markdown(f'사진의 벌은 {percentage}의 확률로 {bee_state}인 상태입니다.')
+
+
+
+
+
+
+if choose == '코로나 데이터 분석':
+    st.error('추후 업데이트 예정입니다.')
+
+if choose == '두피 데이터 분석':
+    st.error('추후 업데이트 예정입니다.')
+
+if choose == '심리 상담 챗봇':
+    st.error('추후 업데이트 예정입니다.')
+
+if choose == '당뇨 예측':
+    st.error('추후 업데이트 예정입니다.')
