@@ -9,7 +9,7 @@ from PIL import Image
 
 import plotly.express as px
 
-from bee_classification import bee_classify
+# from bee_classification import bee_classify
 
 
 # 함수
