@@ -40,8 +40,9 @@ def img_save(directory, file):
         st.session_state['img_name'] = img_name
         st.session_state['img_path'] = f'./{directory}/{img_name}'
         # 이미지 열기
-        # img = Image.open(st.session_state['img_path'])
-        # st.image(img)
+        img = Image.open(st.session_state['img_path'])
+        st.image(img)
+        st.warning('분류 서비스는 추후 업데이트 예정입니다. ( local에서만 구현 완료 )')
     else:
         st.error('사진이 선택되지 않았습니다.')
 
@@ -97,11 +98,11 @@ if choose == '경구약제 사진 분류':
 
 if choose == '꿀벌 사진 분류':
     img_input('꿀벌')
-    if 'img_path' in st.session_state:
-        bee_img_input = st.session_state['img_path']
+#    if 'img_path' in st.session_state:
+#        bee_img_input = st.session_state['img_path']
         # st.image(bee_img)
-        percentage, bee_state = bee_classify(bee_img_input)
-        st.markdown(f'사진의 벌은 {percentage}의 확률로 {bee_state}인 상태입니다.')
+#        percentage, bee_state = bee_classify(bee_img_input)
+#        st.markdown(f'사진의 벌은 {percentage}의 확률로 {bee_state}인 상태입니다.')
 
 
 
